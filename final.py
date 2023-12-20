@@ -5,7 +5,6 @@ from datetime import datetime
 import joblib
 import requests
 import xml.etree.ElementTree as ET
-from sklearn.metrics import mean_squared_error, r2_score
 import pandas as pd
 import matplotlib.pyplot as plt
 import folium
@@ -19,7 +18,7 @@ st.session_state.allow_access = True
 
 @st.cache_resource
 def load_models():
-    # Memuat model regresi linear yang telah disimpan
+    # Load the models here
     loaded_regressor = joblib.load('model_RandomForest.pkl')
     loaded_rf_regressor = joblib.load('model_regresi_linear.pkl')
     return loaded_regressor, loaded_rf_regressor
@@ -55,7 +54,7 @@ def regression_prediction():
             depth = hy.number_input('Depth (km)', key='linear_depth_input', value=0)
 
         predict_button_clicked = hy.button("Predict")
-            
+
     col1_width = 450
     col2_width = 100
     col3_width = 450
@@ -64,10 +63,10 @@ def regression_prediction():
         with col1:
             contoh_data = np.array([[tanggal, latitude, longitude, depth]])
             prediksi_magnitude = loaded_regressor.predict(contoh_data)[0]
-            
+
             hy.markdown("#### Linear Regression Prediction")
             hy.write(f"Predicted Magnitude: {prediksi_magnitude:.2f}")
-            
+
             if prediksi_magnitude <= 1.5:
                 fol1, fol2 = hy.columns(2)
                 with fol1:
@@ -91,10 +90,10 @@ def regression_prediction():
         with col3:
             contoh_data_rf = np.array([[tanggal, latitude, longitude, depth]])
             prediksi_magnitude_rf = loaded_rf_regressor.predict(contoh_data_rf)[0]
-            
+
             hy.markdown("#### Random Forest Regression Prediction")
             hy.write(f"Predicted Magnitude: {prediksi_magnitude_rf:.2f}")
-            
+
             if prediksi_magnitude_rf <= 1.5:
                 mol1, mol2 = hy.columns(2)
                 with mol1:
@@ -114,7 +113,7 @@ def regression_prediction():
                 with mol6:
                     hy.error("Earthquake Classification: Large Earthquake")
         with dol3:
-            hy.markdown("")    
+            hy.markdown("")
 
 @st.cache_resource
 @app.addapp(title='EARTHQUAKE UPDATE', icon="📌")
@@ -125,38 +124,41 @@ def latest_earthquakes():
     hy.markdown("")
     hy.markdown("")
 
-    # Fetch data from BMKG
-    url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
-    response = requests.get(url)
-    
-    data_list = []
-    if response.status_code == 200:
-        # Parse XML data
-        data = ET.fromstring(response.content)
-        
-        i = 1
-        for gempaM5 in data.findall('.//gempa'):
-            data_list.append({
-                "No": i,
-                "Tanggal": gempaM5.find('Tanggal').text,
-                "Jam": gempaM5.find('Jam').text,
-                "DateTime": gempaM5.find('DateTime').text,
-                "Magnitudo": gempaM5.find('Magnitude').text,
-                "Kedalaman": gempaM5.find('Kedalaman').text,
-                "Koordinat": gempaM5.find('point/coordinates').text,
-                "Lintang": gempaM5.find('Lintang').text,
-                "Bujur": gempaM5.find('Bujur').text,
-                "Lokasi": gempaM5.find('Wilayah').text,
-                "Potensi": gempaM5.find('Potensi').text
-            })
-            i += 1
+    try:
+        # Fetch data from BMKG
+        url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
+        response = requests.get(url)
 
-        if hy.checkbox('Show the latest earthquake data'):
-            hy.subheader('Raw data')
-            hy.table(data_list)
-    else:
-        hy.write("Failed to fetch data from BMKG.")
-        
+        data_list = []
+        if response.status_code == 200:
+            # Parse XML data
+            data = ET.fromstring(response.content)
+
+            i = 1
+            for gempaM5 in data.findall('.//gempa'):
+                data_list.append({
+                    "No": i,
+                    "Tanggal": gempaM5.find('Tanggal').text,
+                    "Jam": gempaM5.find('Jam').text,
+                    "DateTime": gempaM5.find('DateTime').text,
+                    "Magnitudo": gempaM5.find('Magnitude').text,
+                    "Kedalaman": gempaM5.find('Kedalaman').text,
+                    "Koordinat": gempaM5.find('point/coordinates').text,
+                    "Lintang": gempaM5.find('Lintang').text,
+                    "Bujur": gempaM5.find('Bujur').text,
+                    "Lokasi": gempaM5.find('Wilayah').text,
+                    "Potensi": gempaM5.find('Potensi').text
+                })
+                i += 1
+
+            if hy.checkbox('Show the latest earthquake data'):
+                hy.subheader('Raw data')
+                hy.table(data_list)
+        else:
+            hy.write(f"Failed to fetch data from BMKG. Status Code: {response.status_code}")
+    except Exception as e:
+        hy.error(f"An error occurred while fetching data from BMKG: {str(e)}")
+
     hy.markdown("")
     hy.markdown("")
     hy.markdown("")
@@ -171,12 +173,12 @@ def latest_earthquakes():
         plt.ylabel('Jumlah Kejadian')
         plt.grid(axis='y', alpha=0.75)
         hy.pyplot(plt)
-        
+
         hy.markdown("")
         hy.markdown("")
         hy.markdown("")
         hy.markdown("")
-        
+
         # Membuat peta dengan marker gempa
         hy.subheader('Map with Markers')
         m = folium.Map(location=[-2, 120], zoom_start=5)
@@ -188,9 +190,10 @@ def latest_earthquakes():
         m.save('gempa_map.html')
 
         # Use st.components.html to embed the HTML file
-        iframe_html = '<iframe src="data:text/html;base64,' + base64.b64encode(open('gempa_map.html', 'r').read().encode()).decode() + '" width=800 height=600></iframe>'
+        iframe_html = '<iframe src="data:text/html;base64,' + base64.b64encode(
+            open('gempa_map.html', 'r').read().encode()).decode() + '" width=800 height=600></iframe>'
         st.components.v1.html(iframe_html, width=700, height=500)
-        
+
     with col2:
         # Scatter Plot Kedalaman vs. Magnitudo:
         hy.subheader('Scatter Plot Depth vs. Magnitudo')
@@ -203,19 +206,19 @@ def latest_earthquakes():
         plt.ylabel('Magnitudo')
         plt.grid(True)
         hy.pyplot(plt)
-        
+
         hy.markdown("")
         hy.markdown("")
         hy.markdown("")
         hy.markdown("")
-        
+
         # Time Series Plot:
         hy.subheader('Time Series Plot - Number of Earthquakes Over Time')
         tanggal_values = []
 
         for gempa in data_list:
             date_str = gempa["DateTime"]
-            
+
             # Parsing the date string to handle the provided format
             parsed_date = datetime.strptime(date_str.split("T")[0], "%Y-%m-%d")
             tanggal_values.append(parsed_date)
@@ -229,9 +232,7 @@ def latest_earthquakes():
         plt.grid(True)
         hy.pyplot(plt)
 
-
-        
-@st.cache_resource      
+@st.cache_resource
 @app.addapp(title='ABOUT', icon="⚙")
 def about():
     hy.title("About the Creator")
