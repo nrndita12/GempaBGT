@@ -189,7 +189,7 @@ def latest_earthquakes():
 
         # Use st.components.html to embed the HTML file
         iframe_html = '<iframe src="data:text/html;base64,' + base64.b64encode(open('gempa_map.html', 'r').read().encode()).decode() + '" width=800 height=600></iframe>'
-        st.components.v1.html(iframe_html, width=700, height=550)
+        st.components.v1.html(iframe_html, width=700, height=500)
         
     with col2:
         # Scatter Plot Kedalaman vs. Magnitudo:
