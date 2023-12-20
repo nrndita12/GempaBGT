@@ -4,3 +4,4 @@ backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#CFD2E0"
 textColor = "#0C0035"
 font = "sans serif"
+port = 8508
