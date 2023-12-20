@@ -128,12 +128,12 @@ def latest_earthquakes():
     # Fetch data from BMKG
     url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
     response = requests.get(url)
-
+    
+    data_list = []
     if response.status_code == 200:
         # Parse XML data
         data = ET.fromstring(response.content)
-
-        data_list = []
+        
         i = 1
         for gempaM5 in data.findall('.//gempa'):
             data_list.append({
