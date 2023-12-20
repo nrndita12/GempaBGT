@@ -45,67 +45,67 @@ def regression_prediction():
             longitude = hy.number_input('Longitude', key='linear_longitude_input', value=0.0)
             depth = hy.number_input('Depth (km)', key='linear_depth_input', value=0)
 
-        if hy.button("Predict", key='predict_button'):
-            hy.markdown("")
+        predict_button_clicked = hy.button("Predict")
             
     col1_width = 450
     col2_width = 100
     col3_width = 450
     col1, col2, col3 = hy.columns([col1_width, col2_width, col3_width])
-    with col1:
-        contoh_data = np.array([[tanggal, latitude, longitude, depth]])
-        prediksi_magnitude = loaded_regressor.predict(contoh_data)[0]
-        
-        hy.markdown("#### Linear Regression Prediction")
-        hy.write(f"Predicted Magnitude: {prediksi_magnitude:.2f}")
-        
-        if prediksi_magnitude <= 1.5:
-            fol1, fol2 = hy.columns(2)
-            with fol1:
-                hy.image('1.png', use_column_width=True)
-            with fol2:
-                hy.success("Earthquake Classification: Small Earthquake")
-        elif 1.5 < prediksi_magnitude <= 3.0:
-            fol3, fol4 = hy.columns(2)
-            with fol3:
-                hy.image('2.png', use_column_width=True)
-            with fol4:
-                hy.warning("Earthquake Classification: Moderate Earthquake")
-        else:
-            fol5,fol6 = hy.columns(2)
-            with fol5:
-                hy.image('3.png', use_column_width=True)
-            with fol6:
-                hy.error("Earthquake Classification: Large Earthquake")
-    with col2:
-        hy.markdown("")
-    with col3:
-        contoh_data_rf = np.array([[tanggal, latitude, longitude, depth]])
-        prediksi_magnitude_rf = loaded_rf_regressor.predict(contoh_data_rf)[0]
-        
-        hy.markdown("#### Random Forest Regression Prediction")
-        hy.write(f"Predicted Magnitude: {prediksi_magnitude_rf:.2f}")
-        
-        if prediksi_magnitude_rf <= 1.5:
-            mol1, mol2 = hy.columns(2)
-            with mol1:
-                hy.image('1.png', use_column_width=True)
-            with mol2:
-                hy.success("Earthquake Classification: Small Earthquake")
-        elif 1.5 < prediksi_magnitude_rf <= 3.0:
-            mol3, mol4 = hy.columns(2)
-            with mol3:
-                hy.image('2.png', use_column_width=True)
-            with mol4:
-                hy.warning("Earthquake Classification: Moderate Earthquake")
-        else:
-            mol5, mol6 = hy.columns(2)
-            with mol5:
-                hy.image('3.png', use_column_width=True)
-            with mol6:
-                hy.error("Earthquake Classification: Large Earthquake")
-    with dol3:
-        hy.markdown("")    
+    if predict_button_clicked:
+        with col1:
+            contoh_data = np.array([[tanggal, latitude, longitude, depth]])
+            prediksi_magnitude = loaded_regressor.predict(contoh_data)[0]
+            
+            hy.markdown("#### Linear Regression Prediction")
+            hy.write(f"Predicted Magnitude: {prediksi_magnitude:.2f}")
+            
+            if prediksi_magnitude <= 1.5:
+                fol1, fol2 = hy.columns(2)
+                with fol1:
+                    hy.image('1.png', use_column_width=True)
+                with fol2:
+                    hy.success("Earthquake Classification: Small Earthquake")
+            elif 1.5 < prediksi_magnitude <= 3.0:
+                fol3, fol4 = hy.columns(2)
+                with fol3:
+                    hy.image('2.png', use_column_width=True)
+                with fol4:
+                    hy.warning("Earthquake Classification: Moderate Earthquake")
+            else:
+                fol5,fol6 = hy.columns(2)
+                with fol5:
+                    hy.image('3.png', use_column_width=True)
+                with fol6:
+                    hy.error("Earthquake Classification: Large Earthquake")
+        with col2:
+            hy.markdown("")
+        with col3:
+            contoh_data_rf = np.array([[tanggal, latitude, longitude, depth]])
+            prediksi_magnitude_rf = loaded_rf_regressor.predict(contoh_data_rf)[0]
+            
+            hy.markdown("#### Random Forest Regression Prediction")
+            hy.write(f"Predicted Magnitude: {prediksi_magnitude_rf:.2f}")
+            
+            if prediksi_magnitude_rf <= 1.5:
+                mol1, mol2 = hy.columns(2)
+                with mol1:
+                    hy.image('1.png', use_column_width=True)
+                with mol2:
+                    hy.success("Earthquake Classification: Small Earthquake")
+            elif 1.5 < prediksi_magnitude_rf <= 3.0:
+                mol3, mol4 = hy.columns(2)
+                with mol3:
+                    hy.image('2.png', use_column_width=True)
+                with mol4:
+                    hy.warning("Earthquake Classification: Moderate Earthquake")
+            else:
+                mol5, mol6 = hy.columns(2)
+                with mol5:
+                    hy.image('3.png', use_column_width=True)
+                with mol6:
+                    hy.error("Earthquake Classification: Large Earthquake")
+        with dol3:
+            hy.markdown("")    
 
 @app.addapp(title='EARTHQUAKE UPDATE', icon="📌")
 def latest_earthquakes():
