@@ -15,19 +15,26 @@ import base64
 st.session_state.sync = True
 st.session_state.allow_access = True
 
-# Memuat model regresi linear yang telah disimpan
-loaded_regressor = joblib.load('model_RandomForest.pkl')
-loaded_rf_regressor = joblib.load('model_regresi_linear.pkl')
+@st.cache_resource
+def load_models():
+    # Memuat model regresi linear yang telah disimpan
+    loaded_regressor = joblib.load('model_RandomForest.pkl')
+    loaded_rf_regressor = joblib.load('model_regresi_linear.pkl')
+    return loaded_regressor, loaded_rf_regressor
+
+loaded_regressor, loaded_rf_regressor = load_models()
 
 # Load Earthquakes.csv into a pandas DataFrame
 gempa_dataset = pd.read_csv('Earthquakes.csv')
 
 app = hy.HydraApp(title='Earthquake Prediction App')
 
+@st.cache_resource
 @app.addapp(title='HOME', icon="🏠")
 def home():
     hy.image('back.png', use_column_width=True)
 
+@st.cache_resource
 @app.addapp(title='REGRESSION PREDICTION', icon="📈")
 def regression_prediction():
     col1_width = 100
@@ -107,6 +114,7 @@ def regression_prediction():
         with dol3:
             hy.markdown("")    
 
+@st.cache_resource
 @app.addapp(title='EARTHQUAKE UPDATE', icon="📌")
 def latest_earthquakes():
     hy.markdown("<h2 style='text-align: center;'>Update Earthquake Information (M ≥ 5.0)</h2>", unsafe_allow_html=True)
@@ -221,7 +229,7 @@ def latest_earthquakes():
 
 
         
-        
+@st.cache_resource      
 @app.addapp(title='ABOUT', icon="⚙")
 def about():
     hy.title("About the Creator")
