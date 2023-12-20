@@ -270,34 +270,39 @@ import requests
 import xml.etree.ElementTree as ET
 
 def fetch_bmkg_data():
-    url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
-    response = requests.get(url)
+    try:
+        url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
+        response = requests.get(url)
 
-    data_list = []
+        if response.status_code == 200:
+            data_list = []
 
-    if response.status_code == 200:
-        # Parse XML data
-        data = ET.fromstring(response.content)
+            # Parse XML data
+            data = ET.fromstring(response.content)
 
-        i = 1
-        for gempaM5 in data.findall('.//gempa'):
-            data_list.append({
-                "No": i,
-                "Tanggal": gempaM5.find('Tanggal').text,
-                "Jam": gempaM5.find('Jam').text,
-                "DateTime": gempaM5.find('DateTime').text,
-                "Magnitudo": gempaM5.find('Magnitude').text,
-                "Kedalaman": gempaM5.find('Kedalaman').text,
-                "Koordinat": gempaM5.find('point/coordinates').text,
-                "Lintang": gempaM5.find('Lintang').text,
-                "Bujur": gempaM5.find('Bujur').text,
-                "Lokasi": gempaM5.find('Wilayah').text,
-                "Potensi": gempaM5.find('Potensi').text
-            })
-            i += 1
+            i = 1
+            for gempaM5 in data.findall('.//gempa'):
+                data_list.append({
+                    "No": i,
+                    "Tanggal": gempaM5.find('Tanggal').text,
+                    "Jam": gempaM5.find('Jam').text,
+                    "DateTime": gempaM5.find('DateTime').text,
+                    "Magnitudo": gempaM5.find('Magnitude').text,
+                    "Kedalaman": gempaM5.find('Kedalaman').text,
+                    "Koordinat": gempaM5.find('point/coordinates').text,
+                    "Lintang": gempaM5.find('Lintang').text,
+                    "Bujur": gempaM5.find('Bujur').text,
+                    "Lokasi": gempaM5.find('Wilayah').text,
+                    "Potensi": gempaM5.find('Potensi').text
+                })
+                i += 1
 
-        return data_list
-    else:
+            return data_list
+        else:
+            st.error(f"Failed to fetch data from BMKG. Status Code: {response.status_code}")
+            return None
+    except Exception as e:
+        st.error(f"An error occurred while fetching data from BMKG: {str(e)}")
         return None
 
 # Example usage in your Streamlit app
@@ -305,6 +310,5 @@ bmkg_data = fetch_bmkg_data()
 
 if bmkg_data:
     st.table(bmkg_data)
-else:
-    st.error("Failed to fetch data from BMKG.")
+
 
