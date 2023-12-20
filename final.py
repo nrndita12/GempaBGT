@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import folium
 import base64
 
+hy.set_page_config(layout='wide', initial_sidebar_state='expanded')
+
 # Initialize session state
 st.session_state.sync = True
 st.session_state.allow_access = True
