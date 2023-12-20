@@ -264,48 +264,47 @@
 # app.run()
 
 
+import hydralit as hy
+import streamlit as st
 import requests
 import xml.etree.ElementTree as ET
 
-url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
-response = requests.get(url)
+def fetch_bmkg_data():
+    url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
+    response = requests.get(url)
 
-data_list = []
+    data_list = []
 
-if response.status_code == 200:
-    # Parse XML data
-    data = ET.fromstring(response.content)
+    if response.status_code == 200:
+        # Parse XML data
+        data = ET.fromstring(response.content)
 
-    i = 1
-    for gempaM5 in data.findall('.//gempa'):
-        data_list.append({
-            "No": i,
-            "Tanggal": gempaM5.find('Tanggal').text,
-            "Jam": gempaM5.find('Jam').text,
-            "DateTime": gempaM5.find('DateTime').text,
-            "Magnitudo": gempaM5.find('Magnitude').text,
-            "Kedalaman": gempaM5.find('Kedalaman').text,
-            "Koordinat": gempaM5.find('point/coordinates').text,
-            "Lintang": gempaM5.find('Lintang').text,
-            "Bujur": gempaM5.find('Bujur').text,
-            "Lokasi": gempaM5.find('Wilayah').text,
-            "Potensi": gempaM5.find('Potensi').text
-        })
-        i += 1
+        i = 1
+        for gempaM5 in data.findall('.//gempa'):
+            data_list.append({
+                "No": i,
+                "Tanggal": gempaM5.find('Tanggal').text,
+                "Jam": gempaM5.find('Jam').text,
+                "DateTime": gempaM5.find('DateTime').text,
+                "Magnitudo": gempaM5.find('Magnitude').text,
+                "Kedalaman": gempaM5.find('Kedalaman').text,
+                "Koordinat": gempaM5.find('point/coordinates').text,
+                "Lintang": gempaM5.find('Lintang').text,
+                "Bujur": gempaM5.find('Bujur').text,
+                "Lokasi": gempaM5.find('Wilayah').text,
+                "Potensi": gempaM5.find('Potensi').text
+            })
+            i += 1
 
-    for gempa_data in data_list:
-        print(f"No: {gempa_data['No']}")
-        print(f"Tanggal: {gempa_data['Tanggal']}")
-        print(f"Jam: {gempa_data['Jam']}")
-        print(f"DateTime: {gempa_data['DateTime']}")
-        print(f"Magnitudo: {gempa_data['Magnitudo']}")
-        print(f"Kedalaman: {gempa_data['Kedalaman']}")
-        print(f"Koordinat: {gempa_data['Koordinat']}")
-        print(f"Lintang: {gempa_data['Lintang']}")
-        print(f"Bujur: {gempa_data['Bujur']}")
-        print(f"Lokasi: {gempa_data['Lokasi']}")
-        print(f"Potensi: {gempa_data['Potensi']}")
-        print("\n")
+        return data_list
+    else:
+        return None
+
+# Example usage in your Streamlit app
+bmkg_data = fetch_bmkg_data()
+
+if bmkg_data:
+    st.table(bmkg_data)
 else:
-    print(f"Failed to fetch data from BMKG. Status Code: {response.status_code}")
+    st.error("Failed to fetch data from BMKG.")
 
